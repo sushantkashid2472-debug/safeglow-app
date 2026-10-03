@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeGlow Guardian 🌸 | Live Companion Tracking</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- App Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <a href="/" class="logo-badge">
+            <div class="logo-icon">🌸</div>
+            <span class="logo-title">SafeGlow Guardian</span>
+        </a>
+        <div class="header-actions">
+            <span id="guardian-battery-badge" class="tag-badge"><i class="fa-solid fa-battery-half"></i> --%</span>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Guardian Reassurance Banner -->
+    <div class="reassurance-banner">
+        <span>🛡️</span> Watching over <b id="user-name-display" style="margin: 0 4px;">Companion</b> in real-time.
+    </div>
+
+    <!-- Main Container -->
+    <main class="main-wrapper">
+
+        <!-- Urgent SOS Banner (Flashes when Walker triggers SOS) -->
+        <div id="guardian-sos-banner" class="sos-active-alert" style="display: none;">
+            <div style="font-size: 1.3rem; font-weight: 800;">
+                <i class="fa-solid fa-bell fa-shake"></i> EMERGENCY SOS TRIGGERED!
+            </div>
+            <p style="font-size: 0.88rem;">
+                The walker has triggered an SOS alert! Immediate assistance may be needed.
+            </p>
+            <div style="background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; font-family: monospace;">
+                Coordinates: <span id="sos-coords-text">Fetching...</span>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 6px;">
+                <a href="tel:112" class="cute-btn" style="background: white; color: var(--sos-red); font-size: 0.85rem; padding: 8px 16px; width: auto;">
+                    <i class="fa-solid fa-phone"></i> Call 112 Police
+                </a>
+                <button class="cute-btn" style="background: rgba(255,255,255,0.2); color: white; font-size: 0.85rem; padding: 8px 16px; width: auto;" onclick="copyCoordinates()">
+                    <i class="fa-solid fa-copy"></i> Copy Location
+                </button>
+                <button class="cute-btn" style="background: rgba(0,0,0,0.4); color: white; font-size: 0.85rem; padding: 8px 16px; width: auto;" onclick="muteGuardianSiren()">
+                    <i class="fa-solid fa-volume-xmark"></i> Mute Siren
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Status Bar Card -->
+        <div class="glow-card" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <span id="guardian-status-badge" class="status-pill status-active">
+                        <span class="status-dot"></span> ✨ Walking Safely
+                    </span>
+                    <span id="ws-guardian-status" class="tag-badge" style="margin-left: 6px;">
+                        <span class="status-dot" style="background: var(--safe-green);"></span> Live GPS Stream
+                    </span>
+                </div>
+                <button id="center-map-btn" onclick="toggleAutoCenter()" class="cute-btn cute-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.78rem;">
+                    <i class="fa-solid fa-crosshairs"></i> Auto-Follow: ON
+                </button>
+            </div>
+
+            <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted);">
+                <span id="destination-display"><i class="fa-solid fa-route" style="color: var(--primary);"></i> In transit</span>
+                <span id="last-seen-display">Connecting...</span>
+            </div>
+        </div>
+
+        <!-- Live Map Card -->
+        <div class="glow-card" style="padding: 12px;">
+            <div id="guardian-map"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
+                <span><i class="fa-solid fa-location-crosshairs" style="color: var(--primary);"></i> Current GPS:</span>
+                <span id="coords-display" style="font-weight: 700; color: var(--text-main);">Locating...</span>
+            </div>
+        </div>
+
+        <!-- Surroundings / Back Camera Snapshot Feed -->
+        <div class="glow-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-camera-retro" style="color: var(--primary);"></i> Surroundings & Visuals
+                </h3>
+                <span class="tag-badge">Rear Camera Feed</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                Photos captured by your companion appear here automatically to verify nearby street signs, shops, or surroundings.
+            </p>
+
+            <div id="snapshots-gallery" class="snapshots-strip">
+                <!-- Snapshots rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- Emergency Quick Dials for Guardian -->
+        <div class="glow-card">
+            <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-phone-volume" style="color: var(--sos-red);"></i> Emergency Quick Action
+            </h3>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                <a href="tel:112" class="emergency-dial-btn" style="background: var(--sos-red-light); border-color: rgba(217,4,41,0.2);">
+                    <div class="dial-icon" style="background: var(--sos-red);"><i class="fa-solid fa-shield"></i></div>
+                    <div class="dial-info">
+                        <span class="dial-title">Call Police / SOS</span>
+                        <span class="dial-number" style="color: var(--sos-red);">112 / 100</span>
+                    </div>
+                </a>
+
+                <a href="tel:1091" class="emergency-dial-btn">
+                    <div class="dial-icon"><i class="fa-solid fa-person-dress"></i></div>
+                    <div class="dial-info">
+                        <span class="dial-title">Women Helpline</span>
+                        <span class="dial-number">1091</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Custom contacts passed by walker -->
+            <div id="guardian-contacts-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;"></div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        SafeGlow Guardian View • Live satellite & GPS stream 🌸
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- App Scripts -->
+    <script src="/static/js/audio.js"></script>
+    <script src="/static/js/track.js"></script>
+</body>
+</html>

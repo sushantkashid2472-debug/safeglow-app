@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeGlow 🌸 | Your Pocket Guardian & Safe Walk</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- App Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <a href="/" class="logo-badge">
+            <div class="logo-icon">🌸</div>
+            <span class="logo-title">SafeGlow</span>
+        </a>
+        <div class="header-actions">
+            <span id="battery-indicator" class="tag-badge"><i class="fa-solid fa-battery-half"></i> 100%</span>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Reassurance Banner -->
+    <div class="reassurance-banner">
+        <span>✨</span> You are safe, protected, and never truly alone. Take a deep breath. <span>🌸</span>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+
+        <!-- SETUP SCREEN (Before starting walk) -->
+        <section id="setup-section" class="glow-card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 8px;">🌸</div>
+                <h2 style="font-weight: 800; font-size: 1.4rem;">Start Your Safe Journey</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                    Heading out alone? Generate your live tracking link in one tap and share it with someone you trust.
+                </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">YOUR NAME</label>
+                    <input type="text" id="user-name-input" placeholder="e.g. Maya, Ananya, Sarah" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(255,93,143,0.25); background: var(--bg-subtle); color: var(--text-main); font-size: 0.95rem; font-weight: 600; outline: none;">
+                </div>
+
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">WHERE ARE YOU HEADING?</label>
+                    <input type="text" id="destination-input" placeholder="e.g. Walking home from Metro Station" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(255,93,143,0.25); background: var(--bg-subtle); color: var(--text-main); font-size: 0.95rem; font-weight: 600; outline: none;">
+                </div>
+
+                <button id="start-walk-btn" class="cute-btn" onclick="startSafeWalk()">
+                    <i class="fa-solid fa-shield-heart"></i> Start Safe Walk & Share Link
+                </button>
+            </div>
+
+            <div style="margin-top: 18px; padding-top: 16px; border-top: 1px dashed rgba(255,93,143,0.2); font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-lock" style="color: var(--safe-green);"></i>
+                <span>Private & secure. Location is only streamed to whoever holds your unique link.</span>
+            </div>
+        </section>
+
+        <!-- ACTIVE WALK SCREEN (When walk is live) -->
+        <section id="active-walk-section" style="display: none; flex-direction: column; gap: 16px;">
+            
+            <!-- Urgent SOS Active Notification Banner -->
+            <div id="sos-active-banner" class="sos-active-alert" style="display: none;">
+                <div style="font-size: 1.4rem; font-weight: 800;"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY SOS BROADCASTING!</div>
+                <p style="font-size: 0.85rem;">Your guardian is alerted with your exact live coordinates and siren alarm.</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 6px;">
+                    <a href="tel:112" class="cute-btn" style="background: white; color: var(--sos-red); font-size: 0.85rem; padding: 8px 16px;">
+                        <i class="fa-solid fa-phone"></i> Call 112 Dispatch
+                    </a>
+                    <button class="cute-btn cute-btn-safe" style="font-size: 0.85rem; padding: 8px 16px;" onclick="resolveSOS()">
+                        <i class="fa-solid fa-check"></i> I am Safe Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Big SOS Centerpiece -->
+            <div class="glow-card sos-section">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <div id="connection-status" class="status-pill status-active">
+                        <span class="status-dot"></span> Live Connected
+                    </div>
+                    <span id="current-loc-badge" class="tag-badge"><i class="fa-solid fa-location-dot"></i> GPS Active</span>
+                </div>
+
+                <div class="sos-btn-wrapper">
+                    <div class="sos-ring"></div>
+                    <button id="main-sos-btn" class="sos-button" onclick="triggerSOS()">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>SOS</span>
+                    </button>
+                </div>
+                <p class="sos-hint">Tap once for immediate SOS siren, guardian alert & surroundings capture</p>
+            </div>
+
+            <!-- Share Tracking Link Card -->
+            <div class="glow-card">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
+                        <i class="fa-solid fa-link" style="color: var(--primary);"></i> Share Live Path with Guardian
+                    </span>
+                    <span class="tag-badge">No app needed for them</span>
+                </div>
+
+                <div class="share-link-box">
+                    <input type="text" id="share-url-input" class="share-link-input" readonly value="">
+                    <button class="copy-btn" onclick="copyShareLink()"><i class="fa-solid fa-copy"></i> Copy</button>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="whatsapp-share-btn" class="whatsapp-btn" style="flex: 1; justify-content: center; padding: 10px;">
+                        <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+                    </button>
+                    <button class="cute-btn cute-btn-secondary" style="width: auto; padding: 10px 16px;" onclick="openCameraModal()">
+                        <i class="fa-solid fa-camera"></i> 📸 Photo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Anxiety Relief & Safety Tools -->
+            <div class="glow-card">
+                <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Quick Safety & Anxiety Tools
+                </h3>
+                
+                <div class="quick-tools-grid">
+                    <!-- Tool 1: Rear Camera Snapshot -->
+                    <div class="tool-card-btn" onclick="openCameraModal()">
+                        <div class="tool-icon camera"><i class="fa-solid fa-camera-retro"></i></div>
+                        <span class="tool-label">Back Camera</span>
+                        <span class="tool-desc">Send surroundings photo</span>
+                    </div>
+
+                    <!-- Tool 2: Fake Call Simulator -->
+                    <div class="tool-card-btn" onclick="startFakeCallRinging()">
+                        <div class="tool-icon phone"><i class="fa-solid fa-phone-volume"></i></div>
+                        <span class="tool-label">Fake Call 📞</span>
+                        <span class="tool-desc">Deter unwanted people</span>
+                    </div>
+
+                    <!-- Tool 3: Calming 4-7-8 Breathing -->
+                    <div class="tool-card-btn" onclick="openBreathingModal()">
+                        <div class="tool-icon breathe"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <span class="tool-label">Calm Breathing</span>
+                        <span class="tool-desc">Ease anxiety & panic</span>
+                    </div>
+
+                    <!-- Tool 4: Audio Siren -->
+                    <div class="tool-card-btn" onclick="triggerSOS()">
+                        <div class="tool-icon siren"><i class="fa-solid fa-volume-high"></i></div>
+                        <span class="tool-label">Loud Siren</span>
+                        <span class="tool-desc">Scare off threats</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Phone Numbers & Contacts -->
+            <div class="glow-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-phone-flip" style="color: var(--sos-red);"></i> Emergency Quick Dial
+                    </h3>
+                    <button onclick="addCustomContact()" style="background: none; border: none; color: var(--primary); font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                        + Add Custom
+                    </button>
+                </div>
+
+                <div id="emergency-contacts-list" class="emergency-grid">
+                    <!-- Populated dynamically via app.js -->
+                </div>
+            </div>
+
+            <!-- End Walk Button -->
+            <div style="margin-top: 10px;">
+                <button class="cute-btn cute-btn-secondary" onclick="endSafeWalk()" style="border-radius: var(--radius-pill);">
+                    <i class="fa-solid fa-circle-check"></i> I've Reached Safely — End Session
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Camera Snapshot Modal (Rear Camera) -->
+    <div id="camera-modal" class="camera-modal" style="display: none;">
+        <div style="color: white; margin-bottom: 12px; font-weight: 700; text-align: center;">
+            <i class="fa-solid fa-camera"></i> Capture Surroundings (Back Camera)
+            <p style="font-size: 0.78rem; color: #A0A3BD; font-weight: 400; margin-top: 2px;">
+                Shows your guardian nearby landmarks, shops, or street signs.
+            </p>
+        </div>
+
+        <div class="camera-view-container">
+            <video id="camera-video" autoplay playsinline></video>
+        </div>
+
+        <div class="camera-controls">
+            <button onclick="closeCameraModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 48px; height: 48px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;">
+                ✕
+            </button>
+            <button class="shutter-btn" onclick="takeSnapshotAndUpload()" title="Take Photo">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            <div style="width: 48px;"></div>
+        </div>
+    </div>
+
+    <!-- Calming 4-7-8 Breathing Modal -->
+    <div id="breathing-modal" class="breathing-modal" style="display: none;">
+        <div class="breathing-card">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <span style="font-size: 0.82rem; font-weight: 700; color: var(--primary);">🌸 ANXIETY SOOTHER</span>
+                <button onclick="closeBreathingModal()" style="border: none; background: none; font-size: 1.1rem; color: var(--text-muted); cursor: pointer;">✕</button>
+            </div>
+
+            <div class="breathing-circle-wrapper">
+                <div id="breathing-anim-circle" class="breathing-circle">
+                    <span style="font-size: 2rem;">🌿</span>
+                </div>
+            </div>
+
+            <div id="breathing-text" class="breathing-instruction">Breathe in slowly... (4s)</div>
+
+            <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+                This resets your autonomic nervous system and slows racing heartbeat. Follow the rhythm.
+            </p>
+
+            <button class="cute-btn cute-btn-secondary" onclick="closeBreathingModal()">
+                I Feel Better Now ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- Realistic Fake Call Simulator Overlay -->
+    <div id="fake-call-overlay" class="fake-call-overlay" style="display: none;">
+        <!-- Incoming View -->
+        <div id="call-incoming-view" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div class="call-header">
+                <div class="caller-avatar">👩</div>
+                <div class="caller-name">Mom 💕</div>
+                <div class="call-subtext">Mobile • Incoming Call...</div>
+            </div>
+
+            <div class="call-actions-incoming">
+                <div style="text-align: center;">
+                    <button class="call-action-btn call-decline" onclick="endFakeCall()">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </button>
+                    <span style="font-size: 0.78rem; margin-top: 6px; display: block;">Decline</span>
+                </div>
+                <div style="text-align: center;">
+                    <button class="call-action-btn call-accept" onclick="acceptFakeCall()">
+                        <i class="fa-solid fa-phone"></i>
+                    </button>
+                    <span style="font-size: 0.78rem; margin-top: 6px; display: block;">Accept</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Call View -->
+        <div id="call-active-view" style="display: none; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div class="call-header">
+                <div class="caller-avatar" style="width: 80px; height: 80px; font-size: 2.2rem;">👩</div>
+                <div class="caller-name">Mom 💕</div>
+                <div id="call-duration-timer" class="call-subtext" style="color: #2EC4B6; font-size: 1.1rem; font-weight: 700;">00:00</div>
+            </div>
+
+            <div style="text-align: center; color: #A0A3BD; font-size: 0.85rem; padding: 20px;">
+                <p>Call connected. Pretend to talk normally:</p>
+                <p style="margin-top: 8px; color: white; font-style: italic;">"Yeah Mom, I'm almost at the corner! See you in 2 minutes."</p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="call-action-btn call-decline" onclick="endFakeCall()" style="margin: 0 auto;">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+                <span style="font-size: 0.78rem; margin-top: 6px; display: block;">End Call</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        SafeGlow • Designed with love for women safety & peace of mind 🌸
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/audio.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
